@@ -18,6 +18,39 @@ export class App extends Component{
     this.setState({ [e.target.name]: e.target.value })
   }
 
+  componentDidMount() {
+    try {
+      const contacts = localStorage.getItem("contacts");
+      return contacts === null ? undefined : this.setState({ "contacts": JSON.parse(contacts) });
+    } catch (error) {
+      console.error("Get state error: ", error.message);
+    }
+    
+  }
+
+  componentDidUpdate(_, { contacts }) {
+
+    if (contacts.length !== this.state.contacts.length) {
+      
+      if (this.state.contacts.length !== 0) {
+        try {
+          localStorage.setItem("contacts", JSON.stringify(this.state.contacts));
+        } catch (error) {
+          console.error(error.message)
+        }
+       
+      } else {
+        try {
+          localStorage.removeItem('contacts') 
+      } catch (error) {
+        console.error(error.message)
+      }}
+    }
+      
+  }
+  
+
+
 
   formSubmit = (e, name, number) => {
     if (this.state.contacts.some(concat => concat.name === name)) {
@@ -28,6 +61,8 @@ export class App extends Component{
       return alert(`${number}is already in contacts`)
     }e.preventDefault()
     this.setState(({ contacts }) => ({ contacts: [...contacts, { id: nanoid(), name: name, number: number }] }));
+
+
   }
 
   deleteContact = (e) => {
